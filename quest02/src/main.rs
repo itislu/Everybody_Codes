@@ -20,7 +20,7 @@ fn part1(input: &String) -> usize {
 
 fn part2(input: &String) -> usize {
     let runes = get_runes(input);
-    let words = input.lines().skip(2).collect::<String>();
+    let words = input.lines().skip(2).collect::<Vec<_>>().join("\n");
     let mut used_indeces = vec![false; words.len()];
 
     for rune in runes {
