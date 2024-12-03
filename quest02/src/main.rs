@@ -1,3 +1,5 @@
+use std::cmp::min;
+
 use utils::input;
 
 fn main() {
@@ -22,11 +24,18 @@ fn part2(input: &String) -> usize {
     let mut res: usize = 0;
     let runes = get_runes(input);
     let words = input.lines().skip(2).collect::<String>();
-    let words_rev = words.chars().rev().collect::<String>();
 
     for rune in runes {
-        res += words.matches(&rune).count() * rune.len();
-        res += words_rev.matches(&rune).count() * rune.len();
+        let rune_rev = rune.chars().rev().collect::<String>();
+        let mut uncounted = rune.len();
+
+        for window in words.as_bytes().windows(rune.len()) {
+            uncounted = min(uncounted + 1, rune.len());
+            if window == rune.as_bytes() || window == rune_rev.as_bytes() {
+                res += uncounted;
+                uncounted = 0;
+            }
+        }
     }
     res
 }
