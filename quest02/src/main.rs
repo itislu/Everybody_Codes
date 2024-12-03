@@ -1,5 +1,3 @@
-use std::cmp::min;
-
 use utils::input;
 
 fn main() {
@@ -21,23 +19,21 @@ fn part1(input: &String) -> usize {
 }
 
 fn part2(input: &String) -> usize {
-    let mut res: usize = 0;
     let runes = get_runes(input);
     let words = input.lines().skip(2).collect::<String>();
+    let mut used_indeces = vec![false; words.len()];
 
     for rune in runes {
         let rune_rev = rune.chars().rev().collect::<String>();
-        let mut uncounted = rune.len();
-
-        for window in words.as_bytes().windows(rune.len()) {
-            uncounted = min(uncounted + 1, rune.len());
+        for (win_pos, window) in words.as_bytes().windows(rune.len()).enumerate() {
             if window == rune.as_bytes() || window == rune_rev.as_bytes() {
-                res += uncounted;
-                uncounted = 0;
+                for i in 0..window.len() {
+                    used_indeces[win_pos + i] = true;
+                }
             }
         }
     }
-    res
+    used_indeces.iter().filter(|&&x| x == true).count()
 }
 
 fn get_runes(input: &String) -> Vec<&str> {
