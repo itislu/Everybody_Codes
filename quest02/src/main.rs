@@ -186,27 +186,60 @@ impl<'a> Iterator for GridIterator<'a> {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
 
-    #[test]
-    fn test_part1() {
-        let input = input::read_file("inputs/part1_example.txt");
-        let res = part1(&input);
-        assert_eq!(res, 12);
+    mod part1 {
+        use super::*;
+
+        #[test]
+        fn example() {
+            let input = input::read_file("inputs/part1_example.txt");
+            let res = part1(&input);
+            assert_eq!(res, 12);
+        }
+
+        #[test]
+        fn answer() {
+            let input = input::read_file("inputs/part1.txt");
+            let res = part1(&input);
+            assert_eq!(res, 34);
+        }
     }
 
-    #[test]
-    fn test_part2() {
-        let input = input::read_file("inputs/part2_example.txt");
-        let res = part2(&input);
-        assert_eq!(res, 42);
+    mod part2 {
+        use super::*;
+
+        #[test]
+        fn example() {
+            let input = input::read_file("inputs/part2_example.txt");
+            let res = part2(&input);
+            assert_eq!(res, 42);
+        }
+
+        #[test]
+        fn answer() {
+            let input = input::read_file("inputs/part2.txt");
+            let res = part2(&input);
+            assert_eq!(res, 5165);
+        }
     }
 
-    #[test]
-    fn test_part3() {
-        let input = input::read_file("inputs/part3_example.txt");
-        let res = part3(&input);
-        assert_eq!(res, 10);
+    mod part3 {
+        use super::*;
+
+        #[test]
+        fn example() {
+            let input = input::read_file("inputs/part3_example.txt");
+            let res = part3(&input);
+            assert_eq!(res, 10);
+        }
+
+        #[test]
+        fn answer() {
+            let input = input::read_file("inputs/part3.txt");
+            let res = part3(&input);
+            assert_eq!(res, 12076);
+        }
     }
 }
