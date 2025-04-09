@@ -5,6 +5,8 @@ fn main() {
     println!("exercise 1: {}", part1and2(&input));
     let input = input::read_file("inputs/part2.txt");
     println!("exercise 2: {}", part1and2(&input));
+    let input = input::read_file("inputs/part3.txt");
+    println!("exercise 3: {}", part3(&input));
 }
 
 fn part1and2(input: &String) -> usize {
@@ -19,10 +21,36 @@ fn part1and2(input: &String) -> usize {
             .filter_map(|(pos, opt_val)| opt_val.map(|val| (pos, val)))
         {
             if map
-                .neighbors(pos)
+                .neighbors_cross(pos)
                 .filter(|&neighbor_val| neighbor_val >= val)
                 .count()
                 == 4
+            {
+                map.increment(pos);
+                changed = true;
+            }
+        }
+    }
+    println!("{map}");
+    map.iter().sum()
+}
+
+fn part3(input: &String) -> usize {
+    let mut map = Map::new(input);
+    let mut changed = true;
+
+    while changed {
+        changed = false;
+        for (pos, val) in map
+            .clone()
+            .iter_all()
+            .filter_map(|(pos, opt_val)| opt_val.map(|val| (pos, val)))
+        {
+            if map
+                .neighbors_all(pos)
+                .filter(|&neighbor_val| neighbor_val >= val)
+                .count()
+                == 8
             {
                 map.increment(pos);
                 changed = true;
@@ -75,7 +103,7 @@ impl Map {
         }
     }
 
-    fn neighbors(&self, pos: Position) -> impl Iterator<Item = usize> {
+    fn neighbors_cross(&self, pos: Position) -> impl Iterator<Item = usize> {
         let mut neighbors: Vec<Option<usize>> = Vec::new();
         if pos.row > 0 {
             neighbors.push(self.grid[pos.row - 1][pos.col]);
@@ -90,6 +118,36 @@ impl Map {
             neighbors.push(self.grid[pos.row + 1][pos.col]);
         }
         neighbors.into_iter().filter_map(|opt| opt)
+    }
+
+    fn neighbors_all(&self, pos: Position) -> impl Iterator<Item = usize> + '_ {
+        [
+            // Cross directions
+            (-1, 0),
+            (0, -1),
+            (0, 1),
+            (1, 0),
+            // Diagonal directions
+            (-1, -1),
+            (-1, 1),
+            (1, -1),
+            (1, 1),
+        ]
+        .into_iter()
+        .filter_map(move |(row_offset, col_offset)| {
+            let new_row = pos.row as isize + row_offset;
+            let new_col = pos.col as isize + col_offset;
+
+            if new_row >= 0
+                && new_row < self.height as isize
+                && new_col >= 0
+                && new_col < self.width as isize
+            {
+                self.grid[new_row as usize][new_col as usize]
+            } else {
+                None
+            }
+        })
     }
 
     fn iter(&self) -> impl Iterator<Item = usize> + '_ {
@@ -165,6 +223,24 @@ mod tests {
             let input = input::read_file("inputs/part2.txt");
             let res = part1and2(&input);
             assert_eq!(res, 2668);
+        }
+    }
+
+    mod part3 {
+        use super::*;
+
+        #[test]
+        fn example() {
+            let input = input::read_file("inputs/part3_example.txt");
+            let res = part3(&input);
+            assert_eq!(res, 29);
+        }
+
+        #[test]
+        fn answer() {
+            let input = input::read_file("inputs/part3.txt");
+            let res = part3(&input);
+            assert_eq!(res, 10190);
         }
     }
 }
