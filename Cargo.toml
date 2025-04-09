@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = [ "quest01", "quest02","utils"]
+members = [ "quest01", "quest02", "quest03","utils"]
 
 [workspace.dependencies]
 utils = { path = "utils" }
