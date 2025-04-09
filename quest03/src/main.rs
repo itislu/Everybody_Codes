@@ -2,10 +2,12 @@ use utils::input;
 
 fn main() {
     let input = input::read_file("inputs/part1.txt");
-    println!("exercise 1: {}", part1(&input));
+    println!("exercise 1: {}", part1and2(&input));
+    let input = input::read_file("inputs/part2.txt");
+    println!("exercise 2: {}", part1and2(&input));
 }
 
-fn part1(input: &String) -> usize {
+fn part1and2(input: &String) -> usize {
     let mut map = Map::new(input);
     let mut changed = true;
 
@@ -143,15 +145,26 @@ mod tests {
         #[test]
         fn example() {
             let input = input::read_file("inputs/part1_example.txt");
-            let res = part1(&input);
+            let res = part1and2(&input);
             assert_eq!(res, 35);
         }
 
         #[test]
         fn answer() {
             let input = input::read_file("inputs/part1.txt");
-            let res = part1(&input);
+            let res = part1and2(&input);
             assert_eq!(res, 124);
+        }
+    }
+
+    mod part2 {
+        use super::*;
+
+        #[test]
+        fn answer() {
+            let input = input::read_file("inputs/part2.txt");
+            let res = part1and2(&input);
+            assert_eq!(res, 2668);
         }
     }
 }
