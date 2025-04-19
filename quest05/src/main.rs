@@ -26,16 +26,14 @@ fn part2(input: &String) -> usize {
 
     loop {
         let round_result = do_round(&mut columns, round);
-        let new_count = round_results
-            .get(&round_result)
-            .and_then(|count| Some(count + 1))
-            .unwrap_or(1);
+        let new_count = *round_results
+            .entry(round_result)
+            .and_modify(|e| *e += 1)
+            .or_insert(1);
 
         if new_count == 2024 {
             return round_result * round;
         }
-
-        round_results.insert(round_result, new_count);
         round += 1;
     }
 }
