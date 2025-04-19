@@ -38,44 +38,45 @@ fn part1(input: &String) -> String {
 fn part2(input: &String) -> usize {
     let mut columns = parse_columns(input);
     let col_count = columns.len();
-    let mut round_results: HashMap<usize, usize> = HashMap::new();
+    let mut round_results: HashMap<String, usize> = HashMap::new();
     let mut round = 1;
 
     loop {
-        let mut cur_col = (round - 1) % col_count;
-        let clapper = columns[cur_col].pop_front().expect("empty column");
-        let mut claps_remaining = clapper;
-
-        loop {
-            cur_col = (cur_col + 1) % col_count;
-            if claps_remaining <= columns[cur_col].len() {
-                columns[cur_col].insert(claps_remaining - 1, clapper);
-                break;
-            }
-            if claps_remaining <= columns[cur_col].len() * 2 {
-                let idx = columns[cur_col].len() - (claps_remaining - columns[cur_col].len()) + 1;
-                columns[cur_col].insert(idx, clapper);
-                break;
-            }
-            claps_remaining -= columns[cur_col].len() * 2;
+        let mut old_col = (round - 1) % col_count;
+        if columns[old_col].is_empty() {
+            round += 1;
+            continue;
         }
+        let clapper = loop {
+            if !columns[old_col].is_empty() {
+                break columns[old_col].pop_front().unwrap();
+            }
+            old_col = (old_col + 1) % col_count;
+        };
+        let new_col = (old_col + 1) % col_count;
 
-        let round_result: usize = columns
+        let pos = (clapper - 1) % (columns[new_col].len() * 2);
+        let index = if pos < columns[new_col].len() {
+            pos
+        } else {
+            columns[new_col].len() - (pos - columns[new_col].len())
+        };
+        columns[new_col].insert(index, clapper);
+
+        let round_result: String = columns
             .iter()
-            .map(|col| col[0].to_string())
-            .collect::<String>()
-            .parse()
-            .unwrap();
+            .map(|col| col.front().unwrap_or(&0).to_string())
+            .collect::<String>();
         let new_count = round_results
             .get(&round_result)
             .and_then(|count| Some(count + 1))
             .unwrap_or(1);
-        round_results.insert(round_result, new_count);
 
         if new_count == 2024 {
-            return round_result * round;
+            return round_result.parse::<usize>().unwrap() * round;
         }
 
+        round_results.insert(round_result, new_count);
         round += 1;
     }
 }
