@@ -38,7 +38,7 @@ fn part1(input: &String) -> String {
 fn part2(input: &String) -> usize {
     let mut columns = parse_columns(input);
     let col_count = columns.len();
-    let mut round_results: HashMap<String, usize> = HashMap::new();
+    let mut round_results: HashMap<usize, usize> = HashMap::new();
     let mut round = 1;
 
     loop {
@@ -54,17 +54,19 @@ fn part2(input: &String) -> usize {
         };
         columns[new_col].insert(index, clapper);
 
-        let round_result: String = columns
+        let round_result: usize = columns
             .iter()
             .map(|col| col[0].to_string())
-            .collect::<String>();
+            .collect::<String>()
+            .parse()
+            .unwrap();
         let new_count = round_results
             .get(&round_result)
             .and_then(|count| Some(count + 1))
             .unwrap_or(1);
 
         if new_count == 2024 {
-            return round_result.parse::<usize>().unwrap() * round;
+            return round_result * round;
         }
 
         round_results.insert(round_result, new_count);
