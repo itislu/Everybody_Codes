@@ -42,17 +42,8 @@ fn part2(input: &String) -> usize {
     let mut round = 1;
 
     loop {
-        let mut old_col = (round - 1) % col_count;
-        if columns[old_col].is_empty() {
-            round += 1;
-            continue;
-        }
-        let clapper = loop {
-            if !columns[old_col].is_empty() {
-                break columns[old_col].pop_front().unwrap();
-            }
-            old_col = (old_col + 1) % col_count;
-        };
+        let old_col = (round - 1) % col_count;
+        let clapper = columns[old_col].pop_front().unwrap();
         let new_col = (old_col + 1) % col_count;
 
         let pos = (clapper - 1) % (columns[new_col].len() * 2);
@@ -65,7 +56,7 @@ fn part2(input: &String) -> usize {
 
         let round_result: String = columns
             .iter()
-            .map(|col| col.front().unwrap_or(&0).to_string())
+            .map(|col| col[0].to_string())
             .collect::<String>();
         let new_count = round_results
             .get(&round_result)
