@@ -9,7 +9,7 @@ fn main() {
     println!("exercise 3: {}", part3(&input));
 }
 
-fn part1and2(input: &String) -> usize {
+fn part1and2(input: &str) -> usize {
     let mut map = Map::new(input);
     let mut changed = true;
 
@@ -35,7 +35,7 @@ fn part1and2(input: &String) -> usize {
     map.iter().sum()
 }
 
-fn part3(input: &String) -> usize {
+fn part3(input: &str) -> usize {
     let mut map = Map::new(input);
     let mut changed = true;
 
@@ -81,7 +81,7 @@ struct Map {
 }
 
 impl Map {
-    fn new(input: &String) -> Map {
+    fn new(input: &str) -> Map {
         let grid: Vec<Vec<Option<usize>>> = input
             .lines()
             .map(|line| {
@@ -117,7 +117,7 @@ impl Map {
         if pos.row + 1 < self.height {
             neighbors.push(self.grid[pos.row + 1][pos.col]);
         }
-        neighbors.into_iter().filter_map(|opt| opt)
+        neighbors.into_iter().flatten()
     }
 
     fn neighbors_all(&self, pos: Position) -> impl Iterator<Item = usize> + '_ {

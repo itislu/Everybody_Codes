@@ -9,14 +9,14 @@ fn main() {
     println!("exercise 3: {}", part3(&input));
 }
 
-fn part1and2(input: &String) -> usize {
+fn part1and2(input: &str) -> usize {
     let nails: Vec<usize> = get_nails(input);
-    let min = nails.iter().min().unwrap().clone();
+    let min = *nails.iter().min().unwrap();
 
     count_hits_to_target(&nails, min)
 }
 
-fn part3(input: &String) -> usize {
+fn part3(input: &str) -> usize {
     let nails: Vec<usize> = get_nails(input);
     let avg = nails.iter().sum::<usize>() / nails.len();
 
@@ -26,15 +26,15 @@ fn part3(input: &String) -> usize {
     )
 }
 
-fn get_nails(input: &String) -> Vec<usize> {
+fn get_nails(input: &str) -> Vec<usize> {
     input.lines().map(|line| line.parse().unwrap()).collect()
 }
 
-fn count_hits_to_target(nails: &Vec<usize>, target: usize) -> usize {
+fn count_hits_to_target(nails: &[usize], target: usize) -> usize {
     nails.iter().map(|nail| nail.abs_diff(target)).sum()
 }
 
-fn try_while_better(nails: &Vec<usize>, start: usize, dir: isize) -> usize {
+fn try_while_better(nails: &[usize], start: usize, dir: isize) -> usize {
     let mut best = count_hits_to_target(nails, start);
     let mut offset = dir;
 

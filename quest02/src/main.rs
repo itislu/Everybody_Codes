@@ -10,7 +10,7 @@ fn main() {
     println!("exercise 3: {}", part3(&input));
 }
 
-fn part1(input: &String) -> usize {
+fn part1(input: &str) -> usize {
     let mut res: usize = 0;
     let runes = get_runes(input);
     let words = input.lines().last().unwrap();
@@ -21,7 +21,7 @@ fn part1(input: &String) -> usize {
     res
 }
 
-fn part2(input: &String) -> usize {
+fn part2(input: &str) -> usize {
     let runes = get_runes(input);
     let words = input.lines().skip(2).collect::<Vec<_>>().join("\n");
     let mut used_indeces = vec![false; words.len()];
@@ -36,12 +36,12 @@ fn part2(input: &String) -> usize {
             }
         }
     }
-    used_indeces.iter().filter(|&&x| x == true).count()
+    used_indeces.iter().filter(|&&x| x).count()
 }
 
-fn part3(input: &String) -> usize {
+fn part3(input: &str) -> usize {
     let runes = get_runes(input);
-    let grid = Grid::new(&input.split("\n\n").nth(1).unwrap_or("").to_string());
+    let grid = Grid::new(input.split("\n\n").nth(1).unwrap_or(""));
     let mut used_indeces: Vec<Vec<bool>> = vec![vec![false; grid.width]; grid.height];
 
     for rune in runes {
@@ -67,12 +67,12 @@ fn part3(input: &String) -> usize {
     used_indeces
         .iter()
         .flatten()
-        .filter(|&&x| x == true)
+        .filter(|&&x| x)
         .count()
 }
 
 fn set_used(
-    used_indeces: &mut Vec<Vec<bool>>,
+    used_indeces: &mut [Vec<bool>],
     i: usize,
     j: usize,
     len: usize,
@@ -94,7 +94,7 @@ fn set_used(
     }
 }
 
-fn get_runes(input: &String) -> Vec<&str> {
+fn get_runes(input: &str) -> Vec<&str> {
     input
         .lines()
         .find(|line| line.starts_with("WORDS:"))
@@ -126,7 +126,7 @@ struct GridIterator<'a> {
 }
 
 impl Grid {
-    fn new(input: &String) -> Self {
+    fn new(input: &str) -> Self {
         let matrix: Vec<Vec<char>> = input.lines().map(|line| line.chars().collect()).collect();
         let height = matrix.len();
         let width = matrix[0].len();
@@ -154,7 +154,7 @@ impl<'a> GridIterator<'a> {
     }
 }
 
-impl<'a> Iterator for GridIterator<'a> {
+impl Iterator for GridIterator<'_> {
     type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {

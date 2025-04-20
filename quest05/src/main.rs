@@ -10,7 +10,7 @@ fn main() {
     println!("exercise 3: {}", part3(&input));
 }
 
-fn part1(input: &String) -> String {
+fn part1(input: &str) -> String {
     let mut columns = parse_columns(input);
 
     for round in 1..=10 {
@@ -19,7 +19,7 @@ fn part1(input: &String) -> String {
     columns.iter().map(|col| col[0].to_string()).collect()
 }
 
-fn part2(input: &String) -> usize {
+fn part2(input: &str) -> usize {
     let mut columns = parse_columns(input);
     let mut round_results: HashMap<usize, usize> = HashMap::new();
     let mut round = 1;
@@ -38,7 +38,7 @@ fn part2(input: &String) -> usize {
     }
 }
 
-fn part3(input: &String) -> usize {
+fn part3(input: &str) -> usize {
     let mut columns = parse_columns(input);
     let elem_count = columns.iter().flatten().count();
     let mut round_results: HashSet<usize> = HashSet::new();
@@ -50,7 +50,7 @@ fn part3(input: &String) -> usize {
     *round_results.iter().max().unwrap()
 }
 
-fn do_round(columns: &mut Vec<VecDeque<usize>>, round: usize) -> usize {
+fn do_round(columns: &mut [VecDeque<usize>], round: usize) -> usize {
     let col_count = columns.len();
     let old_col = (round - 1) % col_count;
     let clapper = columns[old_col].pop_front().unwrap();
@@ -72,8 +72,8 @@ fn do_round(columns: &mut Vec<VecDeque<usize>>, round: usize) -> usize {
         .unwrap()
 }
 
-fn parse_columns(input: &String) -> Vec<VecDeque<usize>> {
-    let col_count = input.lines().nth(0).unwrap().split_whitespace().count();
+fn parse_columns(input: &str) -> Vec<VecDeque<usize>> {
+    let col_count = input.lines().next().unwrap().split_whitespace().count();
     let mut columns: Vec<VecDeque<usize>> = vec![VecDeque::new(); col_count];
 
     for line in input.lines() {

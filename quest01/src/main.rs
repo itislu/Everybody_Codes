@@ -9,7 +9,7 @@ fn main() {
     println!("exercise 3: {}", part3(&input));
 }
 
-fn part1(input: &String) -> usize {
+fn part1(input: &str) -> usize {
     count_occurrences(input, 'B') + count_occurrences(input, 'C') * 3
 }
 
@@ -35,7 +35,7 @@ fn part3(input: &String) -> usize {
     res
 }
 
-fn count_occurrences(input: &String, c: char) -> usize {
+fn count_occurrences(input: &str, c: char) -> usize {
     input.matches(c).count()
 }
 
