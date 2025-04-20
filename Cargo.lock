@@ -77,6 +77,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "quest07"
+version = "0.1.0"
+dependencies = [
+ "utils",
+]
+
+[[package]]
 name = "quote"
 version = "1.0.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
