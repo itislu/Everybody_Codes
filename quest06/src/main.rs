@@ -6,6 +6,8 @@ fn main() {
     println!("exercise 1: {}", part1(&input));
     let input = input::read_file("inputs/part2.txt");
     println!("exercise 2: {}", part2(&input));
+    let input = input::read_file("inputs/part3.txt");
+    println!("exercise 3: {}", part3(&input));
 }
 
 fn part1(input: &String) -> String {
@@ -24,6 +26,21 @@ fn part1(input: &String) -> String {
 }
 
 fn part2(input: &String) -> String {
+    let tree = Tree::new(input);
+    let mut paths: HashMap</*length*/ usize, /*path*/ Option<Vec<Node>>> = HashMap::new();
+
+    for fruit in tree.fruits() {
+        let path: Vec<Node> = tree.path(fruit);
+        paths
+            .entry(path.len())
+            .and_modify(|e| *e = None)
+            .or_insert(Some(path));
+    }
+
+    path_to_string_short(paths.values().filter_map(|v| v.as_ref()).next().unwrap())
+}
+
+fn part3(input: &String) -> String {
     let tree = Tree::new(input);
     let mut paths: HashMap</*length*/ usize, /*path*/ Option<Vec<Node>>> = HashMap::new();
 
