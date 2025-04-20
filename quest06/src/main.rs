@@ -5,7 +5,9 @@ fn main() {
     let input = input::read_file("inputs/part1.txt");
     println!("exercise 1: {}", part1(&input));
     let input = input::read_file("inputs/part2.txt");
-    println!("exercise 2: {}", part2(&input));
+    println!("exercise 2: {}", part2and3(&input));
+    let input = input::read_file("inputs/part3.txt");
+    println!("exercise 3: {}", part2and3(&input));
 }
 
 fn part1(input: &String) -> String {
@@ -23,7 +25,7 @@ fn part1(input: &String) -> String {
     path_to_string(paths.values().filter_map(|v| v.as_ref()).next().unwrap())
 }
 
-fn part2(input: &String) -> String {
+fn part2and3(input: &String) -> String {
     let tree = Tree::new(input);
     let mut paths: HashMap</*length*/ usize, /*path*/ Option<Vec<Node>>> = HashMap::new();
 
@@ -76,8 +78,13 @@ impl Tree {
 
         for line in input.lines() {
             let (parent, children) = line.split_once(':').unwrap();
+
+            if parent == "BUG" || parent == "ANT" {
+                continue;
+            }
             for child in children.split(',') {
                 let node: Node = match child {
+                    "BUG" | "ANT" => continue,
                     "@" => {
                         let fruit_id = fruit_count;
                         fruit_count += 1;
@@ -134,8 +141,19 @@ mod tests {
         #[test]
         fn answer() {
             let input = input::read_file("inputs/part2.txt");
-            let res = part2(&input);
+            let res = part2and3(&input);
             assert_eq!(res, "RFBMNWSHLW@");
+        }
+    }
+
+    mod part3 {
+        use super::*;
+
+        #[test]
+        fn answer() {
+            let input = input::read_file("inputs/part3.txt");
+            let res = part2and3(&input);
+            assert_eq!(res, "RPPLHWXLKSTB@");
         }
     }
 }
