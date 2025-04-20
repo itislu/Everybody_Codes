@@ -12,39 +12,36 @@ fn main() {
 
 fn part1(input: &String) -> String {
     let tree = Tree::new(input);
-    let mut paths: HashMap</*length*/ usize, /*path*/ Option<Vec<Node>>> = HashMap::new();
-
-    for fruit in tree.fruits() {
-        let path: Vec<Node> = tree.path(fruit);
-        paths
-            .entry(path.len())
-            .and_modify(|e| *e = None)
-            .or_insert(Some(path));
-    }
-
-    path_to_string(paths.values().filter_map(|v| v.as_ref()).next().unwrap())
+    path_to_string(&find_unique_path(&tree))
 }
 
 fn part2and3(input: &String) -> String {
     let tree = Tree::new(input);
-    let mut paths: HashMap</*length*/ usize, /*path*/ Option<Vec<Node>>> = HashMap::new();
+    path_to_string_short(&find_unique_path(&tree))
+}
+
+fn find_unique_path(tree: &Tree) -> Vec<&Node> {
+    let mut paths: HashMap</*length*/ usize, /*path*/ Option<Vec<&Node>>> = HashMap::new();
 
     for fruit in tree.fruits() {
-        let path: Vec<Node> = tree.path(fruit);
+        let path: Vec<&Node> = tree.path(fruit);
         paths
             .entry(path.len())
             .and_modify(|e| *e = None)
             .or_insert(Some(path));
     }
-
-    path_to_string_short(paths.values().filter_map(|v| v.as_ref()).next().unwrap())
+    paths
+        .drain()
+        .filter_map(|(_, v)| v)
+        .next()
+        .expect("No unique path found")
 }
 
-fn path_to_string(path: &Vec<Node>) -> String {
+fn path_to_string(path: &Vec<&Node>) -> String {
     path.iter().rev().map(|node| node.to_string()).collect()
 }
 
-fn path_to_string_short(path: &Vec<Node>) -> String {
+fn path_to_string_short(path: &Vec<&Node>) -> String {
     path.iter()
         .rev()
         .map(|node| node.to_string().chars().next().unwrap())
@@ -68,7 +65,6 @@ impl std::fmt::Display for Node {
 
 struct Tree {
     map: HashMap<Node, /*parent*/ Node>,
-    fruit_count: usize,
 }
 
 impl Tree {
@@ -95,19 +91,21 @@ impl Tree {
                 map.insert(node, Node::Branch(parent.to_owned()));
             }
         }
-        Tree { map, fruit_count }
+        Tree { map }
     }
 
-    fn fruits(&self) -> impl Iterator<Item = Node> {
-        (0..self.fruit_count).map(|fruit_id| Node::Fruit(fruit_id))
+    fn fruits(&self) -> impl Iterator<Item = &Node> {
+        self.map
+            .keys()
+            .filter(|node| matches!(**node, Node::Fruit(_)))
     }
 
-    fn path(&self, mut node: Node) -> Vec<Node> {
-        let mut path: Vec<Node> = vec![node.clone()];
+    fn path<'a>(&'a self, mut node: &'a Node) -> Vec<&'a Node> {
+        let mut path: Vec<&'a Node> = vec![&node];
 
         while let Some(parent) = self.map.get(&node) {
-            path.push(parent.clone());
-            node = parent.clone();
+            node = parent;
+            path.push(parent);
         }
         path
     }
