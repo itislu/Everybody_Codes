@@ -10,17 +10,17 @@ fn main() {
     println!("exercise 3: {}", part2and3(&input));
 }
 
-fn part1(input: &String) -> String {
+fn part1(input: &str) -> String {
     let tree = Tree::new(input);
     path_to_string(&find_unique_path(&tree))
 }
 
-fn part2and3(input: &String) -> String {
+fn part2and3(input: &str) -> String {
     let tree = Tree::new(input);
     path_to_string_short(&find_unique_path(&tree))
 }
 
-fn find_unique_path(tree: &Tree) -> Vec<&Node> {
+fn find_unique_path<'a>(tree: &'a Tree<'a>) -> Vec<&'a Node<'a>> {
     let mut paths: HashMap</*length*/ usize, /*path*/ Option<Vec<&Node>>> = HashMap::new();
 
     for fruit in tree.fruits() {
@@ -49,12 +49,12 @@ fn path_to_string_short(path: &Vec<&Node>) -> String {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
-enum Node {
-    Branch(String),
+enum Node<'a> {
+    Branch(&'a str),
     Fruit(usize),
 }
 
-impl std::fmt::Display for Node {
+impl std::fmt::Display for Node<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Node::Branch(s) => write!(f, "{}", s),
@@ -63,12 +63,12 @@ impl std::fmt::Display for Node {
     }
 }
 
-struct Tree {
-    map: HashMap<Node, /*parent*/ Node>,
+struct Tree<'a> {
+    map: HashMap<Node<'a>, /*parent*/ Node<'a>>,
 }
 
-impl Tree {
-    fn new(input: &String) -> Self {
+impl<'input> Tree<'input> {
+    fn new(input: &'input str) -> Self {
         let mut map = HashMap::new();
         let mut fruit_count = 0;
 
@@ -86,9 +86,9 @@ impl Tree {
                         fruit_count += 1;
                         Node::Fruit(fruit_id)
                     }
-                    _ => Node::Branch(child.to_owned()),
+                    _ => Node::Branch(child),
                 };
-                map.insert(node, Node::Branch(parent.to_owned()));
+                map.insert(node, Node::Branch(parent));
             }
         }
         Tree { map }
@@ -100,10 +100,10 @@ impl Tree {
             .filter(|node| matches!(**node, Node::Fruit(_)))
     }
 
-    fn path<'a>(&'a self, mut node: &'a Node) -> Vec<&'a Node> {
-        let mut path: Vec<&'a Node> = vec![&node];
+    fn path(&'input self, mut node: &'input Node<'input>) -> Vec<&'input Node<'input>> {
+        let mut path: Vec<&'input Node> = vec![node];
 
-        while let Some(parent) = self.map.get(&node) {
+        while let Some(parent) = self.map.get(node) {
             node = parent;
             path.push(parent);
         }
