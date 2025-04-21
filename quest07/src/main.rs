@@ -38,51 +38,6 @@ fn part3(input: &str, track: &str) -> usize {
         .count()
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
-enum Action {
-    Plus,
-    Minus,
-    Equal,
-}
-
-impl From<&str> for Action {
-    fn from(value: &str) -> Self {
-        if value.len() != 1 {
-            panic!("Invalid string length for Action")
-        }
-        Action::from(value.chars().next().unwrap())
-    }
-}
-
-impl From<char> for Action {
-    fn from(value: char) -> Self {
-        match value {
-            '+' => Action::Plus,
-            '-' => Action::Minus,
-            '=' | 'S' => Action::Equal,
-            _ => panic!("Invalid symbol for Action"),
-        }
-    }
-}
-
-impl Add<Action> for usize {
-    type Output = usize;
-
-    fn add(self, rhs: Action) -> Self::Output {
-        match rhs {
-            Action::Plus => self + 1,
-            Action::Minus => self.saturating_sub(1),
-            Action::Equal => self,
-        }
-    }
-}
-
-impl AddAssign<Action> for usize {
-    fn add_assign(&mut self, rhs: Action) {
-        *self = *self + rhs;
-    }
-}
-
 #[derive(Debug)]
 struct Plan {
     actions: Vec<Action>,
@@ -146,6 +101,51 @@ impl Plan {
             value += power;
         }
         value
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+enum Action {
+    Plus,
+    Minus,
+    Equal,
+}
+
+impl From<&str> for Action {
+    fn from(value: &str) -> Self {
+        if value.len() != 1 {
+            panic!("Invalid string length for Action")
+        }
+        Action::from(value.chars().next().unwrap())
+    }
+}
+
+impl From<char> for Action {
+    fn from(value: char) -> Self {
+        match value {
+            '+' => Action::Plus,
+            '-' => Action::Minus,
+            '=' | 'S' => Action::Equal,
+            _ => panic!("Invalid symbol for Action"),
+        }
+    }
+}
+
+impl Add<Action> for usize {
+    type Output = usize;
+
+    fn add(self, rhs: Action) -> Self::Output {
+        match rhs {
+            Action::Plus => self + 1,
+            Action::Minus => self.saturating_sub(1),
+            Action::Equal => self,
+        }
+    }
+}
+
+impl AddAssign<Action> for usize {
+    fn add_assign(&mut self, rhs: Action) {
+        *self = *self + rhs;
     }
 }
 
