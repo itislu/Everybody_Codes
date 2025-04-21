@@ -4,3 +4,6 @@ members = [ "quest01", "quest02", "quest03", "quest04", "quest05", "quest06", "q
 
 [workspace.dependencies]
 utils = { path = "utils" }
+
+[profile.dev.package.quest07]
+opt-level = 3
