@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::ops::{Add, AddAssign};
 use utils::input;
 
@@ -7,6 +8,9 @@ fn main() {
     let input = input::read_file("inputs/part2.txt");
     let track = input::read_file("inputs/part2_track.txt");
     println!("exercise 2: {}", part2(&input, &track));
+    let input = input::read_file("inputs/part3.txt");
+    let track = input::read_file("inputs/part3_track.txt");
+    println!("exercise 3: {}", part3(&input, &track));
 }
 
 fn part1(input: &str) -> String {
@@ -18,34 +22,23 @@ fn part1(input: &str) -> String {
 
 fn part2(input: &str, track: &str) -> String {
     let mut plans: Vec<Plan> = input.lines().map(Plan::new).collect();
-    let track_actions: Vec<Action> = parse_track_actions(track);
+    let track_actions: Vec<Action> = track::parse_track_actions(track);
 
     plans.sort_by_cached_key(|plan| plan.value_on_track(10, &track_actions, 10));
     plans.iter().rev().map(|plan| plan.id).collect()
 }
 
-// Assumes 'S' is at (0, 0)
-fn parse_track_actions(track: &str) -> Vec<Action> {
-    let mut track_actions = Vec::new();
-    let track_2d: Vec<Vec<char>> = track.lines().map(|line| line.chars().collect()).collect();
-    let (width, height) = (track_2d[0].len(), track_2d.len());
+fn part3(input: &str, track: &str) -> usize {
+    let track_actions: Vec<Action> = track::parse_track_actions(track);
+    let plan_to_beat = Plan::new(input);
+    let score_to_beat = plan_to_beat.value_on_track(10, &track_actions, 2024);
 
-    for col in 1..width {
-        track_actions.push(Action::from(track_2d[0][col]));
-    }
-    for row in 1..height {
-        track_actions.push(Action::from(track_2d[row][width - 1]));
-    }
-    for col in (0..width - 1).rev() {
-        track_actions.push(Action::from(track_2d[height - 1][col]));
-    }
-    for row in (0..height - 1).rev() {
-        track_actions.push(Action::from(track_2d[row][0]));
-    }
-    track_actions
+    Plan::permutations(5, 3, 3)
+        .filter(|plan| plan.value_on_track(10, &track_actions, 2024) > score_to_beat)
+        .count()
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 enum Action {
     Plus,
     Minus,
@@ -55,7 +48,7 @@ enum Action {
 impl From<&str> for Action {
     fn from(value: &str) -> Self {
         if value.len() != 1 {
-            panic!("invalid string length for Action")
+            panic!("Invalid string length for Action")
         }
         Action::from(value.chars().next().unwrap())
     }
@@ -67,7 +60,7 @@ impl From<char> for Action {
             '+' => Action::Plus,
             '-' => Action::Minus,
             '=' | 'S' => Action::Equal,
-            _ => panic!("invalid symbol for Action"),
+            _ => panic!("Invalid symbol for Action"),
         }
     }
 }
@@ -110,6 +103,21 @@ impl Plan {
         plan
     }
 
+    fn permutations(pluses: usize, minuses: usize, equals: usize) -> impl Iterator<Item = Self> {
+        vec![Action::Plus; pluses]
+            .into_iter()
+            .chain(vec![Action::Minus; minuses].into_iter())
+            .chain(vec![Action::Equal; equals].into_iter())
+            .permutations(pluses + minuses + equals)
+            .sorted_unstable()
+            .dedup()
+            .enumerate()
+            .map(|(n, actions)| Self {
+                actions,
+                id: (b'A' + (n % 26) as u8) as char,
+            })
+    }
+
     fn value(&self, mut power: usize, length: usize) -> usize {
         let mut value = 0;
 
@@ -138,6 +146,42 @@ impl Plan {
             value += power;
         }
         value
+    }
+}
+
+mod track {
+    use crate::Action;
+    use utils::{grid::Grid, grid::Position};
+
+    pub fn parse_track_actions(track: &str) -> Vec<Action> {
+        let mut track_actions = Vec::new();
+        let track2d = Grid::from(track);
+        let mut prev_pos = track2d
+            .iter()
+            .find_map(|(p, &c)| (c == 'S').then_some(p))
+            .expect("No starting point 'S' found");
+        let mut cur_pos = get_next_pos(&prev_pos, &prev_pos, &track2d);
+
+        loop {
+            track_actions.push(Action::from(*track2d.get(&cur_pos).unwrap()));
+            (prev_pos, cur_pos) = (cur_pos, get_next_pos(&cur_pos, &prev_pos, &track2d));
+
+            if *track2d.get(&prev_pos).unwrap() == 'S' {
+                break;
+            }
+        }
+
+        track_actions
+    }
+
+    fn get_next_pos(cur_pos: &Position, prev_pos: &Position, track2d: &Grid<char>) -> Position {
+        let max_pos = Position::new(track2d.height - 1, track2d.width - 1);
+        cur_pos
+            .neighbors_contained(max_pos)
+            .filter(|p| p != prev_pos)
+            .filter(|p| track2d.get(p).map_or(false, |c| !c.is_whitespace()))
+            .next()
+            .unwrap()
     }
 }
 
@@ -180,6 +224,18 @@ mod tests {
             let track = input::read_file("inputs/part2_track.txt");
             let res = part2(&input, &track);
             assert_eq!(res, "FAIKHBEJG");
+        }
+    }
+
+    mod part3 {
+        use super::*;
+
+        #[test]
+        fn answer() {
+            let input = input::read_file("inputs/part3.txt");
+            let track = input::read_file("inputs/part3_track.txt");
+            let res = part3(&input, &track);
+            assert_eq!(res, 5839);
         }
     }
 }
