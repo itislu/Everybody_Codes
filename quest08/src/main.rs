@@ -148,5 +148,12 @@ mod tests {
             let res = part3(&input, 10, 202400000);
             assert_eq!(res, 41067);
         }
+
+        #[test]
+        fn answer_pre_update() {
+            let input = input::read_file("inputs/part3.txt");
+            let res = part3(&input, 10, 202400000000);
+            assert_eq!(res, 204163);
+        }
     }
 }
